@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codenova-backend
+  namespace: production
+  labels:
+    app: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: 470745673259.dkr.ecr.ap-south-1.amazonaws.com/codenova-backend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: codenova-config
+            - secretRef:
+                name: codenova-secrets
+          volumeMounts:
+            - name: docker-sock
+              mountPath: /var/run/docker.sock
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1024Mi"
+          livenessProbe:
+            httpGet:
+              path: /api/languages
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /api/languages
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: docker-sock
+          hostPath:
+            path: /var/run/docker.sock
