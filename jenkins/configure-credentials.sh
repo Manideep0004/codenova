@@ -1,0 +1,23 @@
+#!/bin/bash
+# configure-credentials.sh - Guide to configuring Jenkins Credentials
+
+echo "You must manually configure the following inside Jenkins UI (Manage Jenkins -> Credentials):"
+echo ""
+echo "1. GitHub Credentials:"
+echo "   - ID: github-credentials"
+echo "   - Kind: Username with password (or SSH Key)"
+echo "   - Username: Manideep0004"
+echo ""
+echo "2. AWS Credentials:"
+echo "   - Since Jenkins is running on an EC2 instance, the BEST PRACTICE is to assign the IAM Role 'codenova-jenkins-role' directly to the EC2 instance."
+echo "   - This grants Jenkins seamless access to ECR and EKS without hardcoding Access Keys."
+echo "   - If you must use IAM user keys, configure them via 'aws configure' as the 'jenkins' user:"
+echo "     sudo su - jenkins"
+echo "     aws configure"
+echo ""
+echo "3. Kubeconfig Access:"
+echo "   - Assuming the EC2 has the Jenkins role attached, run the following as the 'jenkins' user to connect kubectl:"
+echo "     sudo su - jenkins"
+echo "     aws eks update-kubeconfig --region ap-south-1 --name codenova-cluster"
+echo ""
+echo "Note: The Jenkinsfile is configured to use the EC2 IAM Role automatically for AWS CLI commands."
