@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
+const logger = require('./utils/logger');
 
 const { sequelize } = require('./models');
 
@@ -18,7 +19,7 @@ const app = express();
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
-app.use(morgan('combined'));
+app.use(morgan('combined', { stream: { write: message => logger.info(message.trim()) } }));
 
 // Rate Limiting
 const limiter = rateLimit({
@@ -34,18 +35,18 @@ app.use('/api/languages', languageRoutes);
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  logger.error(err.stack);
   res.status(500).json({ error: 'Internal Server Error' });
 });
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, async () => {
-  console.log(`Server running on port ${PORT}`);
+  logger.info(`Server running on port ${PORT}`);
   try {
     await sequelize.authenticate();
-    console.log('Database connected successfully.');
+    logger.info('Database connected successfully.');
   } catch (error) {
-    console.error('Unable to connect to the database:', error);
+    logger.error('Unable to connect to the database:', error);
   }
 });
