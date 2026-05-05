@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  namespace: monitoring
+data:
+  alertmanager.yml: |
+    global:
+      smtp_smarthost: 'smtp.gmail.com:587'
+      smtp_from: 'alertmanager@codenova.com'
+      smtp_auth_username: 'alertmanager@codenova.com'
+      smtp_auth_password: 'dummy_password'
+    route:
+      receiver: 'email-alert'
+      group_wait: 10s
+      group_interval: 5m
+      repeat_interval: 3h
+    receivers:
+      - name: 'email-alert'
+        email_configs:
+          - to: 'manideepgudiya2004@gmail.com'
