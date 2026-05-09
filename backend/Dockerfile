@@ -19,6 +19,7 @@ COPY --from=builder /app/models ./models
 COPY --from=builder /app/routes ./routes
 COPY --from=builder /app/seeders ./seeders
 COPY --from=builder /app/services ./services
+COPY --from=builder /app/utils ./utils
 COPY --from=builder /app/.sequelizerc ./
 
 # Note: /var/run/docker.sock must be mounted at runtime for Dockerode

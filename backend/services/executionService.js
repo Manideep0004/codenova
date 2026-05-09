@@ -4,7 +4,7 @@ const docker = new Docker();
 
 const IMAGES = {
   Python: 'python:3.11-slim',
-  Java: 'openjdk:17-slim',
+  Java: 'eclipse-temurin:17-jdk-alpine',
   'C++': 'gcc:12',
   JavaScript: 'node:18-alpine'
 };
