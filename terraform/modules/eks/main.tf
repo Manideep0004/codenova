@@ -9,8 +9,10 @@ resource "aws_eks_cluster" "codenova" {
   role_arn = var.eks_cluster_role_arn
 
   vpc_config {
-    subnet_ids         = var.subnet_ids
-    security_group_ids = [var.eks_security_group_id]
+    subnet_ids              = var.subnet_ids
+    security_group_ids      = [var.eks_security_group_id]
+    endpoint_private_access = true
+    endpoint_public_access  = true
   }
 }
 
@@ -19,7 +21,7 @@ resource "aws_eks_node_group" "codenova_nodes" {
   node_group_name = "codenova-node-group"
   node_role_arn   = var.eks_node_role_arn
   subnet_ids      = var.subnet_ids
-  instance_types  = ["t3.medium"]
+  instance_types  = ["t3.small"]
 
   scaling_config {
     desired_size = 2

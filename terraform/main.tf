@@ -22,6 +22,8 @@ module "eks" {
   eks_cluster_role_arn    = module.iam.eks_cluster_role_arn
   eks_node_role_arn       = module.iam.eks_node_role_arn
   eks_security_group_id   = module.security_groups.eks_cluster_sg_id
+
+  depends_on = [module.iam]
 }
 
 module "rds" {
