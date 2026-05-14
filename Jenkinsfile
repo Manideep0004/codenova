@@ -20,10 +20,10 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 dir('backend') {
-                    sh 'npm ci'
+                    bat 'npm ci'
                 }
                 dir('frontend') {
-                    sh 'npm ci'
+                    bat 'npm ci'
                 }
             }
         }
@@ -31,53 +31,49 @@ pipeline {
         stage('Run Tests') {
             steps {
                 dir('backend') {
-                    sh 'npm test'
+                    bat 'npm test'
                 }
             }
         }
 
         stage('Build Docker Images') {
             steps {
-                sh "docker build -t codenova-backend:${GIT_COMMIT} ./backend"
-                sh "docker build -t codenova-frontend:${GIT_COMMIT} ./frontend"
+                bat "docker build -t codenova-backend:${GIT_COMMIT} ./backend"
+                bat "docker build -t codenova-frontend:${GIT_COMMIT} ./frontend"
             }
         }
 
         stage('Push to ECR') {
             steps {
-                sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+                bat "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
                 
-                sh "docker tag codenova-backend:${GIT_COMMIT} ${ECR_BACKEND}:${GIT_COMMIT}"
-                sh "docker tag codenova-backend:${GIT_COMMIT} ${ECR_BACKEND}:latest"
-                sh "docker push ${ECR_BACKEND}:${GIT_COMMIT}"
-                sh "docker push ${ECR_BACKEND}:latest"
+                bat "docker tag codenova-backend:${GIT_COMMIT} ${ECR_BACKEND}:${GIT_COMMIT}"
+                bat "docker tag codenova-backend:${GIT_COMMIT} ${ECR_BACKEND}:latest"
+                bat "docker push ${ECR_BACKEND}:${GIT_COMMIT}"
+                bat "docker push ${ECR_BACKEND}:latest"
 
-                sh "docker tag codenova-frontend:${GIT_COMMIT} ${ECR_FRONTEND}:${GIT_COMMIT}"
-                sh "docker tag codenova-frontend:${GIT_COMMIT} ${ECR_FRONTEND}:latest"
-                sh "docker push ${ECR_FRONTEND}:${GIT_COMMIT}"
-                sh "docker push ${ECR_FRONTEND}:latest"
+                bat "docker tag codenova-frontend:${GIT_COMMIT} ${ECR_FRONTEND}:${GIT_COMMIT}"
+                bat "docker tag codenova-frontend:${GIT_COMMIT} ${ECR_FRONTEND}:latest"
+                bat "docker push ${ECR_FRONTEND}:${GIT_COMMIT}"
+                bat "docker push ${ECR_FRONTEND}:latest"
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh "kubectl set image deployment/codenova-backend backend=${ECR_BACKEND}:${GIT_COMMIT} -n production"
-                sh "kubectl set image deployment/codenova-frontend frontend=${ECR_FRONTEND}:${GIT_COMMIT} -n production"
+                bat "kubectl set image deployment/codenova-backend backend=${ECR_BACKEND}:${GIT_COMMIT} -n production"
+                bat "kubectl set image deployment/codenova-frontend frontend=${ECR_FRONTEND}:${GIT_COMMIT} -n production"
                 
-                sh "kubectl rollout status deployment/codenova-backend -n production"
-                sh "kubectl rollout status deployment/codenova-frontend -n production"
+                bat "kubectl rollout status deployment/codenova-backend -n production"
+                bat "kubectl rollout status deployment/codenova-frontend -n production"
             }
         }
 
         stage('Smoke Test') {
             steps {
                 sleep 10
-                sh """
-                    STATUS=\$(curl -s -o /dev/null -w "%{http_code}" http://${DOMAIN}/api/languages)
-                    if [ "\$STATUS" -ne 200 ]; then
-                        echo "Smoke test failed! Status: \$STATUS"
-                        exit 1
-                    fi
+                bat """
+                    curl -f http://${DOMAIN}/api/languages || exit /b 1
                 """
             }
         }
