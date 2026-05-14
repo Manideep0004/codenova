@@ -13,7 +13,8 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/auth/login', { email, password });
+      const res = await api.post('/auth/login', { email, password });
+      localStorage.setItem('token', res.data.token);
       const meRes = await api.get('/auth/me');
       setUser(meRes.data);
       navigate('/editor');

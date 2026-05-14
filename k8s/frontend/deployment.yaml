@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: 470745673259.dkr.ecr.ap-south-1.amazonaws.com/codenova-frontend:latest
+          image: manideep0004/codenova-frontend:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80

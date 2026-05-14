@@ -6,6 +6,7 @@ metadata:
 data:
   NODE_ENV: "production"
   PORT: "5000"
-  DB_HOST: "codenova-postgres.cneicu6yqsym.ap-south-1.rds.amazonaws.com"
+  DB_HOST: "postgres.production.svc.cluster.local"
   DB_PORT: "5432"
   DB_NAME: "codenova_prod"
+  FRONTEND_URL: "http://a42f7070983a145f98a3edeb7c98a215-1394932142.ap-south-1.elb.amazonaws.com"
