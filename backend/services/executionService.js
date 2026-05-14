@@ -1,6 +1,11 @@
 const Docker = require('dockerode');
 const { ExecutionResult, Submission, Language } = require('../models');
-const docker = new Docker();
+
+// If DOCKER_HOST is set (like in our K8s deployment), connect explicitly via TCP to the DinD sidecar
+const dockerOpts = process.env.DOCKER_HOST 
+  ? { host: '127.0.0.1', port: 2375 } 
+  : { socketPath: '/var/run/docker.sock' };
+const docker = new Docker(dockerOpts);
 
 const IMAGES = {
   Python: 'python:3.11-slim',
@@ -40,6 +45,28 @@ exports.executeCode = async (submissionId) => {
     const languageName = submission.language.name;
     const image = IMAGES[languageName];
     const cmds = getCommands(languageName, submission.code);
+
+    // Pull the image if it doesn't exist locally
+    try {
+      await docker.getImage(image).inspect();
+    } catch (e) {
+      if (e.statusCode === 404) {
+        console.log(`Pulling image ${image}...`);
+        await new Promise((resolve, reject) => {
+          docker.pull(image, (err, stream) => {
+            if (err) return reject(err);
+            docker.modem.followProgress(stream, onFinished, onProgress);
+            function onFinished(err, output) {
+              if (err) return reject(err);
+              resolve(output);
+            }
+            function onProgress(event) {}
+          });
+        });
+      } else {
+        throw e;
+      }
+    }
 
     container = await docker.createContainer({
       Image: image,
