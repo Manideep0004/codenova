@@ -22,3 +22,18 @@ Please refer to the following documents for setup instructions:
 - [Local Setup (Docker Compose)](docs/LOCAL_SETUP.md)
 - [Deployment (AWS & Terraform)](docs/DEPLOYMENT.md)
 - [Architecture](docs/ARCHITECTURE.md)
+
+
+DB_HOST=db
+DB_PORT=5432
+DB_NAME=codenova
+DB_USER=postgres
+DB_PASSWORD=postgres
+JWT_SECRET=any_random_secret_key
+NODE_ENV=development
+PORT=5000
+FRONTEND_URL=http://localhost:3000
+
+
+# Step 3 — Start everything with one command
+docker-compose up --build
