@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs 'NodeJS'
+    }
+
     environment {
         AWS_REGION      = 'ap-south-1'
         AWS_ACCOUNT_ID  = '470745673259'
@@ -73,19 +77,6 @@ pipeline {
                 sleep 10
                 bat "curl -f http://${DOMAIN}/api/languages || exit /b 1"
             }
-        }
-    }
-
-    post {
-        success {
-            mail to: "${env.EMAIL_TO}",
-                 subject: "SUCCESS: Codenova Pipeline [${env.BUILD_NUMBER}]",
-                 body: "Good news! The pipeline successfully built and deployed commit ${GIT_COMMIT}."
-        }
-        failure {
-            mail to: "${env.EMAIL_TO}",
-                 subject: "FAILURE: Codenova Pipeline [${env.BUILD_NUMBER}]",
-                 body: "Pipeline failed on commit ${GIT_COMMIT}. Please check Jenkins logs at ${env.BUILD_URL}"
         }
     }
 }
