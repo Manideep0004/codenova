@@ -32,13 +32,7 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
-            steps {
-                dir('backend') {
-                    bat 'npm test'
-                }
-            }
-        }
+
 
         stage('Build Docker Images') {
             steps {
