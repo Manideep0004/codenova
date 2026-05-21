@@ -1,5 +1,6 @@
 const Docker = require('dockerode');
 const { ExecutionResult, Submission, Language } = require('../models');
+const { codeExecutionsTotal, codeExecutionTimeSeconds } = require('../utils/metrics');
 
 // If DOCKER_HOST is set (like in our K8s deployment), connect explicitly via TCP to the DinD sidecar
 const dockerOpts = process.env.DOCKER_HOST 
@@ -114,6 +115,9 @@ exports.executeCode = async (submissionId) => {
     const stderrText = Buffer.concat(stderr).toString('utf8');
     const executionTime = Date.now() - startTime;
 
+    codeExecutionTimeSeconds.labels(languageName).observe(executionTime / 1000);
+    codeExecutionsTotal.labels(languageName, result.StatusCode === 0 ? 'success' : 'failed').inc();
+
     await ExecutionResult.create({
       submissionId,
       stdout: stdoutText,
@@ -127,6 +131,10 @@ exports.executeCode = async (submissionId) => {
 
   } catch (error) {
     let errMessage = error.message;
+    // We might not have languageName if it failed before fetching
+    const lang = (typeof languageName !== 'undefined') ? languageName : 'Unknown';
+    codeExecutionsTotal.labels(lang, 'error').inc();
+
     if (container && errMessage === 'Execution Timeout') {
       try { await container.kill(); } catch (e) {}
     }
