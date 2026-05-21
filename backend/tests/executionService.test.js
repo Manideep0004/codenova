@@ -12,6 +12,16 @@ jest.mock('../models', () => ({
   },
   Language: {}
 }));
+jest.mock('../utils/metrics', () => ({
+  codeExecutionsTotal: {
+    labels: jest.fn().mockReturnThis(),
+    inc: jest.fn()
+  },
+  codeExecutionTimeSeconds: {
+    labels: jest.fn().mockReturnThis(),
+    observe: jest.fn()
+  }
+}));
 jest.mock('dockerode');
 
 describe('Execution Service', () => {
@@ -29,6 +39,9 @@ describe('Execution Service', () => {
     };
 
     Docker.prototype.createContainer = jest.fn().mockResolvedValue(mockContainer);
+    Docker.prototype.getImage = jest.fn().mockReturnValue({
+      inspect: jest.fn().mockResolvedValue(true)
+    });
   });
 
   it('should execute code and save the result successfully', async () => {
