@@ -1,0 +1,36 @@
+```
+└── 📁k8s
+    └── 📁alertmanager
+        ├── configmap.yaml
+        ├── deployment.yaml
+    └── 📁backend
+        ├── deployment.yaml
+        ├── hpa.yaml
+        ├── service.yaml
+    └── 📁elasticsearch
+        ├── deployment.yaml
+    └── 📁filebeat
+        ├── daemonset.yaml
+    └── 📁frontend
+        ├── deployment.yaml
+        ├── service.yaml
+    └── 📁grafana
+        ├── configmap.yaml
+        ├── deployment.yaml
+    └── 📁kibana
+        ├── deployment.yaml
+        ├── saved-objects-job.yaml
+    └── 📁logstash
+        ├── deployment.yaml
+    └── 📁postgres
+        ├── service.yaml
+        ├── statefulset.yaml
+    └── 📁prometheus
+        ├── configmap.yaml
+        ├── deployment.yaml
+    ├── configmap.yaml
+    ├── ingress.yaml
+    ├── namespace.yaml
+    ├── network-policy.yaml
+    └── secrets.yaml
+```

@@ -1,0 +1,41 @@
+```
+└── 📁backend
+    └── 📁config
+        ├── config.js
+        ├── config.json
+    └── 📁controllers
+        ├── authController.js
+        ├── languageController.js
+        ├── submissionController.js
+    └── 📁middleware
+        ├── authMiddleware.js
+    └── 📁migrations
+        ├── 20260502000000-create-users.js
+        ├── 20260502000001-create-languages.js
+        ├── 20260502000002-create-submissions.js
+        ├── 20260502000003-create-execution-results.js
+    └── 📁models
+        ├── ExecutionResult.js
+        ├── index.js
+        ├── Language.js
+        ├── Submission.js
+        ├── User.js
+    └── 📁routes
+        ├── auth.js
+        ├── languages.js
+        ├── submissions.js
+    └── 📁seeders
+        ├── 20260502000000-seed-languages.js
+    └── 📁services
+        ├── executionService.js
+    └── 📁tests
+        ├── executionService.test.js
+    └── 📁utils
+        ├── logger.js
+    ├── .env
+    ├── .sequelizerc
+    ├── Dockerfile
+    ├── package-lock.json
+    ├── package.json
+    └── server.js
+```

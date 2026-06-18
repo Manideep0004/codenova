@@ -1,0 +1,37 @@
+```
+└── 📁terraform
+    └── 📁.terraform
+        └── 📁modules
+            ├── modules.json
+        └── 📁providers
+            └── 📁registry.terraform.io
+                └── 📁hashicorp
+                    └── 📁aws
+                        └── 📁6.44.0
+                            └── 📁windows_386
+                                ├── LICENSE.txt
+                                ├── terraform-provider-aws_v6.44.0_x5.exe
+    └── 📁modules
+        └── 📁ecr
+            ├── main.tf
+        └── 📁eks
+            ├── main.tf
+        └── 📁iam
+            ├── main.tf
+        └── 📁rds
+            ├── main.tf
+        └── 📁s3
+            ├── main.tf
+        └── 📁security_groups
+            ├── main.tf
+        └── 📁vpc
+            ├── main.tf
+    ├── .terraform.lock.hcl
+    ├── backend.tf
+    ├── main.tf
+    ├── outputs.tf
+    ├── terraform.tfstate
+    ├── terraform.tfstate.backup
+    ├── terraform.tfvars
+    └── variables.tf
+```

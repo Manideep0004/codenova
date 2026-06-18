@@ -1,0 +1,27 @@
+# Core Pipeline
+workflow-aggregator:latest
+pipeline-stage-view:latest
+blueocean:latest
+
+# Source Control
+git:latest
+github:latest
+github-branch-source:latest
+
+# Docker
+docker-workflow:latest
+docker-plugin:latest
+
+# Credentials & Security
+credentials-binding:latest
+plain-credentials:latest
+ssh-credentials:latest
+
+# Notifications
+email-ext:latest
+mailer:latest
+
+# Utilities
+ws-cleanup:latest
+timestamper:latest
+ansicolor:latest

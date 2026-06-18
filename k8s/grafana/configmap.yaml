@@ -40,23 +40,23 @@ data:
     {
       "title": "System Overview",
       "panels": [
-        { "type": "graph", "title": "CPU Usage", "targets": [ { "expr": "sum(rate(container_cpu_usage_seconds_total[5m])) by (pod)" } ] },
-        { "type": "graph", "title": "Memory Usage", "targets": [ { "expr": "sum(container_memory_usage_bytes) by (pod)" } ] }
+        { "type": "graph", "title": "CPU Usage", "gridPos": { "h": 10, "w": 12, "x": 0, "y": 0 }, "targets": [ { "expr": "sum(rate(container_cpu_usage_seconds_total[5m])) by (pod)" } ] },
+        { "type": "graph", "title": "Memory Usage", "gridPos": { "h": 10, "w": 12, "x": 12, "y": 0 }, "targets": [ { "expr": "sum(container_memory_usage_bytes) by (pod)" } ] }
       ]
     }
   api-performance.json: |
     {
       "title": "API Performance",
       "panels": [
-        { "type": "graph", "title": "Request Rate", "targets": [ { "expr": "sum(rate(http_requests_total[5m]))" } ] },
-        { "type": "graph", "title": "Error Rate", "targets": [ { "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m]))" } ] }
+        { "type": "graph", "title": "Request Rate", "gridPos": { "h": 10, "w": 12, "x": 0, "y": 0 }, "targets": [ { "expr": "sum(rate(http_requests_total[5m]))" } ] },
+        { "type": "graph", "title": "Error Rate", "gridPos": { "h": 10, "w": 12, "x": 12, "y": 0 }, "targets": [ { "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m]))" } ] }
       ]
     }
   code-execution.json: |
     {
       "title": "Code Execution Metrics",
       "panels": [
-        { "type": "graph", "title": "Executions / Min", "targets": [ { "expr": "rate(code_executions_total[1m])" } ] },
-        { "type": "graph", "title": "Avg Execution Time by Lang", "targets": [ { "expr": "rate(code_execution_time_seconds_sum[5m]) / rate(code_execution_time_seconds_count[5m])" } ] }
+        { "type": "graph", "title": "Executions / Min", "gridPos": { "h": 10, "w": 12, "x": 0, "y": 0 }, "targets": [ { "expr": "rate(code_executions_total[1m])" } ] },
+        { "type": "graph", "title": "Avg Execution Time by Lang", "gridPos": { "h": 10, "w": 12, "x": 12, "y": 0 }, "targets": [ { "expr": "rate(code_execution_time_seconds_sum[5m]) / rate(code_execution_time_seconds_count[5m])" } ] }
       ]
     }

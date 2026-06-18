@@ -1,0 +1,46 @@
+# jenkins/docker-compose.jenkins.yml
+# Run Jenkins locally in Docker with full access to Docker daemon and persistent home.
+#
+# Usage:
+#   cd jenkins
+#   docker compose -f docker-compose.jenkins.yml up -d --build
+#   Open http://localhost:8080
+#
+# To get the initial admin password:
+#   docker exec jenkins-codenova cat /var/jenkins_home/secrets/initialAdminPassword
+
+version: '3.8'
+
+services:
+  jenkins:
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
+    image: codenova-jenkins:latest
+    container_name: jenkins-codenova
+    restart: unless-stopped
+    ports:
+      - "8080:8080"   # Jenkins Web UI
+      - "50000:50000" # Jenkins agent JNLP port (for future distributed builds)
+    volumes:
+      # Persist Jenkins home so jobs/configs survive restarts
+      - jenkins_home:/var/jenkins_home
+      # Mount host Docker socket so Jenkins can build & push images
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Mount AWS config from host so Jenkins inherits your credentials
+      - ${USERPROFILE}/.aws:/var/jenkins_home/.aws:ro
+      # Mount kubeconfig from host so kubectl works immediately
+      - ${USERPROFILE}/.kube:/var/jenkins_home/.kube:ro
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+      - JENKINS_OPTS=--prefix=/
+    networks:
+      - jenkins_net
+
+volumes:
+  jenkins_home:
+    name: codenova_jenkins_home
+
+networks:
+  jenkins_net:
+    driver: bridge

@@ -1,0 +1,54 @@
+# jenkins/Dockerfile.jenkins
+# Custom Jenkins image with AWS CLI, kubectl, Docker CLI, and Node.js pre-installed.
+# This avoids installing tools at pipeline runtime.
+
+FROM jenkins/jenkins:lts-jdk17
+
+USER root
+
+# ── System dependencies ────────────────────────────────────────────────────────
+RUN apt-get update -y && apt-get install -y \
+    curl \
+    unzip \
+    git \
+    apt-transport-https \
+    ca-certificates \
+    gnupg \
+    lsb-release \
+    && rm -rf /var/lib/apt/lists/*
+
+# ── Docker CLI (not daemon — daemon runs on the host via socket mount) ─────────
+RUN curl -fsSL https://download.docker.com/linux/debian/gpg | \
+      gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
+      https://download.docker.com/linux/debian $(lsb_release -cs) stable" \
+      > /etc/apt/sources.list.d/docker.list && \
+    apt-get update -y && \
+    apt-get install -y docker-ce-cli && \
+    rm -rf /var/lib/apt/lists/*
+
+# ── AWS CLI v2 ─────────────────────────────────────────────────────────────────
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip && \
+    unzip /tmp/awscliv2.zip -d /tmp && \
+    /tmp/aws/install && \
+    rm -rf /tmp/aws /tmp/awscliv2.zip
+
+# ── kubectl ────────────────────────────────────────────────────────────────────
+RUN KUBECTL_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt) && \
+    curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
+    install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl && \
+    rm kubectl
+
+# ── Node.js 18 (for npm ci / npm test on Jenkins agent) ───────────────────────
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists/*
+
+# ── Pre-install Jenkins plugins ────────────────────────────────────────────────
+COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
+RUN jenkins-plugin-cli --plugin-file /usr/share/jenkins/ref/plugins.txt
+
+# ── Give jenkins user access to the Docker socket ─────────────────────────────
+RUN groupadd -f docker && usermod -aG docker jenkins
+
+USER jenkins
