@@ -38,6 +38,8 @@ services:
       - DB_PASSWORD=${DB_PASSWORD:-postgres}
       - DB_NAME=${DB_NAME:-codenova_dev}
       - JWT_SECRET=${JWT_SECRET:-dev_secret}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     ports:
       - "5000:5000"
     volumes:
@@ -50,6 +52,32 @@ services:
     networks:
       - codenova_net
     command: npm run dev
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: builder
+    container_name: codenova_dev_worker
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - DB_NAME=${DB_NAME:-codenova_dev}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - codenova_net
+    command: npm run worker
 
   frontend:
     build:
@@ -67,6 +95,28 @@ services:
     depends_on:
       - backend
     command: npm start
+
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    container_name: codenova_dev_prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - codenova_net
+
+  grafana:
+    image: grafana/grafana:10.0.0
+    container_name: codenova_dev_grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - codenova_net
+    depends_on:
+      - prometheus
 
 networks:
   codenova_net:

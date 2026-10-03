@@ -4,6 +4,7 @@ npm-debug.log
 yarn-error.log
 .env
 .env.local
+*.pem
 
 # Docker
 docker-compose.override.yml
@@ -14,6 +15,9 @@ docker-compose.override.yml
 *.tfstate.backup
 .terraform.tfstate.lock.info
 crash.log
+*.old
+frontend/build/
+create_commits.ps1
 *.tfvars
 
 # Kubernetes
