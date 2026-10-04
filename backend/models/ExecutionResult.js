@@ -2,15 +2,24 @@
 module.exports = (sequelize, DataTypes) => {
   const ExecutionResult = sequelize.define('ExecutionResult', {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    submissionId: { type: DataTypes.INTEGER, allowNull: false },
+    submissionId: { 
+      type: DataTypes.INTEGER, 
+      allowNull: false, 
+      unique: true,
+      references: { model: 'submissions', key: 'id' },
+      onDelete: 'CASCADE'
+    },
     stdout: { type: DataTypes.TEXT, allowNull: true },
     stderr: { type: DataTypes.TEXT, allowNull: true },
     executionTime: { type: DataTypes.INTEGER, allowNull: true }, // in ms
-    memoryUsed: { type: DataTypes.INTEGER, allowNull: true }, // in KB
+    memoryUsed: { type: DataTypes.INTEGER, allowNull: true, defaultValue: 0 }, // in KB
     exitCode: { type: DataTypes.INTEGER, allowNull: true }
   }, {
     tableName: 'execution_results',
-    timestamps: true
+    timestamps: true,
+    indexes: [
+      { fields: ['submissionId'] }
+    ]
   });
 
   ExecutionResult.associate = (models) => {

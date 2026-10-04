@@ -6,6 +6,17 @@ module.exports = {
       username: { type: Sequelize.STRING, allowNull: false, unique: true },
       email: { type: Sequelize.STRING, allowNull: false, unique: true },
       password: { type: Sequelize.STRING, allowNull: false },
+      roleId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 2,
+        references: {
+          model: 'roles',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'RESTRICT'
+      },
       createdAt: { type: Sequelize.DATE, allowNull: false },
       updatedAt: { type: Sequelize.DATE, allowNull: false }
     });
