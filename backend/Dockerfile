@@ -1,6 +1,7 @@
 # Stage 1: Build
 FROM node:18-alpine AS builder
 WORKDIR /app
+RUN apk add --no-cache python3 make g++
 COPY package*.json ./
 RUN npm install
 COPY . .
@@ -11,6 +12,7 @@ WORKDIR /app
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/server.js ./
+COPY --from=builder /app/worker.js ./
 COPY --from=builder /app/config ./config
 COPY --from=builder /app/controllers ./controllers
 COPY --from=builder /app/middleware ./middleware
