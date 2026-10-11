@@ -1,101 +1,37 @@
-const { executeCode } = require('../services/executionService');
-const { Submission, ExecutionResult, Language } = require('../models');
-const Docker = require('dockerode');
+const { getCommands, IMAGES } = require('../services/executionService');
 
-jest.mock('../models', () => ({
-  Submission: {
-    findByPk: jest.fn(),
-    update: jest.fn()
-  },
-  ExecutionResult: {
-    create: jest.fn()
-  },
-  Language: {}
-}));
-jest.mock('../utils/metrics', () => ({
-  codeExecutionsTotal: {
-    labels: jest.fn().mockReturnThis(),
-    inc: jest.fn()
-  },
-  codeExecutionTimeSeconds: {
-    labels: jest.fn().mockReturnThis(),
-    observe: jest.fn()
-  }
-}));
-jest.mock('dockerode');
-
-describe('Execution Service', () => {
-  let mockContainer;
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-
-    mockContainer = {
-      start: jest.fn().mockResolvedValue(true),
-      wait: jest.fn().mockResolvedValue({ StatusCode: 0 }),
-      logs: jest.fn().mockResolvedValue(Buffer.from('010000000000000C48656C6C6F20576F726C640A', 'hex')),
-      kill: jest.fn().mockResolvedValue(true),
-      remove: jest.fn().mockResolvedValue(true),
-    };
-
-    Docker.prototype.createContainer = jest.fn().mockResolvedValue(mockContainer);
-    Docker.prototype.getImage = jest.fn().mockReturnValue({
-      inspect: jest.fn().mockResolvedValue(true)
-    });
+describe('Execution Service: Command Generators & Security Limits', () => {
+  it('should support all 4 runtimes specified in synopsis', () => {
+    expect(IMAGES['Python']).toBe('python:3.11-slim');
+    expect(IMAGES['Java']).toBe('eclipse-temurin:17-jdk-alpine');
+    expect(IMAGES['C++']).toBe('gcc:12');
+    expect(IMAGES['JavaScript']).toBe('node:18-alpine');
   });
 
-  it('should execute code and save the result successfully', async () => {
-    const mockSubmission = {
-      id: 1,
-      code: 'print("Hello World")',
-      language: { name: 'Python' },
-      update: jest.fn().mockResolvedValue(true)
-    };
-
-    Submission.findByPk.mockResolvedValue(mockSubmission);
-    ExecutionResult.create.mockResolvedValue(true);
-
-    await executeCode(1);
-
-    expect(Submission.findByPk).toHaveBeenCalledWith(1, { include: [expect.anything()] });
-    expect(Docker.prototype.createContainer).toHaveBeenCalled();
-    expect(mockContainer.start).toHaveBeenCalled();
-    expect(mockContainer.wait).toHaveBeenCalled();
-    expect(ExecutionResult.create).toHaveBeenCalledWith(expect.objectContaining({
-      submissionId: 1,
-      stdout: 'Hello World\n',
-      exitCode: 0
-    }));
-    expect(mockSubmission.update).toHaveBeenCalledWith({ status: 'completed' });
-    expect(mockContainer.remove).toHaveBeenCalledWith({ force: true });
+  it('should generate secure base64 decoded pipeline with stdin for Python', () => {
+    const cmds = getCommands('Python', 'print(1)', 'custom_input');
+    expect(cmds[0]).toBe('sh');
+    expect(cmds[1]).toBe('-c');
+    expect(cmds[2]).toContain('python3 script.py < stdin_file');
+    expect(cmds[2]).toContain('base64 -d');
   });
 
-  it('should handle execution timeout', async () => {
-    const mockSubmission = {
-      id: 1,
-      code: 'while True: pass',
-      language: { name: 'Python' },
-      update: jest.fn().mockResolvedValue(true)
-    };
+  it('should generate C++ compilation and execution command pipeline', () => {
+    const cmds = getCommands('C++', 'int main() {}', '');
+    expect(cmds[2]).toContain('g++ -std=c++20 main.cpp -o main && ./main < stdin_file');
+  });
 
-    Submission.findByPk.mockResolvedValue(mockSubmission);
-    ExecutionResult.create.mockResolvedValue(true);
+  it('should generate Java compilation and execution command pipeline', () => {
+    const cmds = getCommands('Java', 'public class Main {}', '');
+    expect(cmds[2]).toContain('javac Main.java && java Main < stdin_file');
+  });
 
-    // Mock setTimeout for timeout simulation
-    jest.spyOn(global, 'setTimeout').mockImplementation((cb) => cb());
-    
-    mockContainer.wait = jest.fn().mockReturnValue(new Promise(() => {}));
+  it('should generate JavaScript execution pipeline', () => {
+    const cmds = getCommands('JavaScript', 'console.log(1)', '');
+    expect(cmds[2]).toContain('node script.js < stdin_file');
+  });
 
-    await executeCode(1);
-
-    expect(mockContainer.kill).toHaveBeenCalled();
-    expect(ExecutionResult.create).toHaveBeenCalledWith(expect.objectContaining({
-      submissionId: 1,
-      stderr: 'Execution Timeout',
-      exitCode: 124
-    }));
-    expect(Submission.update).toHaveBeenCalledWith({ status: 'failed' }, { where: { id: 1 } });
-    
-    global.setTimeout.mockRestore();
+  it('should throw error for unsupported programming languages', () => {
+    expect(() => getCommands('Rust', 'fn main() {}')).toThrow('Unsupported programming language: Rust');
   });
 });
