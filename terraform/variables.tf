@@ -1,13 +1,13 @@
 variable "region" {
   description = "AWS Region"
   type        = string
-  default     = "ap-south-1"
+  default     = "ap-southeast-2"
 }
 
 variable "account_id" {
   description = "AWS Account ID"
   type        = string
-  default     = "470745673259"
+  default     = "427282815124"
 }
 
 variable "db_password" {
