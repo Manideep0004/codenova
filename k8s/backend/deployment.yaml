@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: manideep0004/codenova-backend:latest
+          image: 427282815124.dkr.ecr.ap-southeast-2.amazonaws.com/codenova-backend:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 5000
@@ -35,11 +35,11 @@ spec:
                 name: codenova-secrets
           resources:
             requests:
-              cpu: "250m"
-              memory: "256Mi"
+              cpu: "100m"
+              memory: "128Mi"
             limits:
-              cpu: "1000m"
-              memory: "1024Mi"
+              cpu: "500m"
+              memory: "512Mi"
 
         - name: dind
           image: docker:24-dind
@@ -50,11 +50,11 @@ spec:
               value: ""
           resources:
             requests:
-              cpu: "250m"
-              memory: "256Mi"
+              cpu: "100m"
+              memory: "128Mi"
             limits:
-              cpu: "1000m"
-              memory: "1024Mi"
+              cpu: "500m"
+              memory: "512Mi"
           volumeMounts:
             - name: dind-storage
               mountPath: /var/lib/docker
