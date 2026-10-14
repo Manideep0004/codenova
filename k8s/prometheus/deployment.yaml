@@ -21,6 +21,13 @@ spec:
             - "--config.file=/etc/prometheus/prometheus.yml"
           ports:
             - containerPort: 9090
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 384Mi
           volumeMounts:
             - name: config-volume
               mountPath: /etc/prometheus
@@ -35,7 +42,7 @@ metadata:
   name: prometheus-service
   namespace: monitoring
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: prometheus
   ports:

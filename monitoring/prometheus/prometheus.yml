@@ -1,0 +1,24 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: 'codenova-backend-docker'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['backend:5000']
+        labels:
+          app: 'codenova-backend'
+          environment: 'docker'
+
+  - job_name: 'codenova-backend-host'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['host.docker.internal:5000']
+        labels:
+          app: 'codenova-backend'
+          environment: 'local-host'
+
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
