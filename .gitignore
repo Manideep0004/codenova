@@ -18,6 +18,8 @@ crash.log
 *.old
 frontend/build/
 create_commits.ps1
+generate_docx_report.py
+~$*
 *.tfvars
 
 # Kubernetes
