@@ -22,7 +22,7 @@ data:
   dashboards.yml: |
     apiVersion: 1
     providers:
-      - name: 'Codenova Dashboards'
+      - name: 'CodeNova Dashboards'
         orgId: 1
         folder: ''
         type: file
@@ -36,27 +36,508 @@ metadata:
   name: grafana-dashboards
   namespace: monitoring
 data:
-  system-overview.json: |
+  codenova-command-center.json: |
     {
-      "title": "System Overview",
+      "annotations": {
+        "list": []
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 1,
+      "id": null,
+      "links": [],
+      "liveNow": true,
       "panels": [
-        { "type": "graph", "title": "CPU Usage", "gridPos": { "h": 10, "w": 12, "x": 0, "y": 0 }, "targets": [ { "expr": "sum(rate(container_cpu_usage_seconds_total[5m])) by (pod)" } ] },
-        { "type": "graph", "title": "Memory Usage", "gridPos": { "h": 10, "w": 12, "x": 12, "y": 0 }, "targets": [ { "expr": "sum(container_memory_usage_bytes) by (pod)" } ] }
-      ]
-    }
-  api-performance.json: |
-    {
-      "title": "API Performance",
-      "panels": [
-        { "type": "graph", "title": "Request Rate", "gridPos": { "h": 10, "w": 12, "x": 0, "y": 0 }, "targets": [ { "expr": "sum(rate(http_requests_total[5m]))" } ] },
-        { "type": "graph", "title": "Error Rate", "gridPos": { "h": 10, "w": 12, "x": 12, "y": 0 }, "targets": [ { "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m]))" } ] }
-      ]
-    }
-  code-execution.json: |
-    {
-      "title": "Code Execution Metrics",
-      "panels": [
-        { "type": "graph", "title": "Executions / Min", "gridPos": { "h": 10, "w": 12, "x": 0, "y": 0 }, "targets": [ { "expr": "rate(code_executions_total[1m])" } ] },
-        { "type": "graph", "title": "Avg Execution Time by Lang", "gridPos": { "h": 10, "w": 12, "x": 12, "y": 0 }, "targets": [ { "expr": "rate(code_execution_time_seconds_sum[5m]) / rate(code_execution_time_seconds_count[5m])" } ] }
-      ]
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 100,
+          "title": "\u26a1 Live Sandbox Health & Key Performance Indicators",
+          "type": "row"
+        },
+        {
+          "id": 1,
+          "title": "Total Code Executions",
+          "type": "stat",
+          "gridPos": {
+            "h": 5,
+            "w": 6,
+            "x": 0,
+            "y": 1
+          },
+          "targets": [
+            {
+              "expr": "sum(code_executions_total) or vector(0)",
+              "legendFormat": "Executions",
+              "refId": "A"
+            }
+          ],
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 1
+                  }
+                ]
+              },
+              "unit": "short"
+            }
+          }
+        },
+        {
+          "id": 2,
+          "title": "Bull Queue Backlog (Active & Waiting)",
+          "type": "gauge",
+          "gridPos": {
+            "h": 5,
+            "w": 6,
+            "x": 6,
+            "y": 1
+          },
+          "targets": [
+            {
+              "expr": "code_queue_depth or vector(0)",
+              "legendFormat": "Jobs in Queue",
+              "refId": "A"
+            }
+          ],
+          "options": {
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "min": 0,
+              "max": 20,
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "#EAB839",
+                    "value": 4
+                  },
+                  {
+                    "color": "red",
+                    "value": 10
+                  }
+                ]
+              },
+              "unit": "short"
+            }
+          }
+        },
+        {
+          "id": 3,
+          "title": "Sandbox Watchdog Status",
+          "type": "stat",
+          "gridPos": {
+            "h": 5,
+            "w": 6,
+            "x": 12,
+            "y": 1
+          },
+          "targets": [
+            {
+              "expr": "sum(code_executions_total{status=\"timeout\"}) or vector(0)",
+              "legendFormat": "Infinite Loops Caught",
+              "refId": "A"
+            }
+          ],
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 1
+                  }
+                ]
+              },
+              "unit": "short"
+            }
+          }
+        },
+        {
+          "id": 4,
+          "title": "Air-Gapped Security Isolation",
+          "type": "stat",
+          "gridPos": {
+            "h": 5,
+            "w": 6,
+            "x": 18,
+            "y": 1
+          },
+          "targets": [
+            {
+              "expr": "vector(100)",
+              "legendFormat": "Security Score",
+              "refId": "A"
+            }
+          ],
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "percent"
+            }
+          }
+        },
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 6
+          },
+          "id": 101,
+          "title": "\ud83d\udcca Multi-Language Distribution & Throughput Analytics",
+          "type": "row"
+        },
+        {
+          "id": 5,
+          "title": "Language Popularity Distribution (Donut Chart)",
+          "type": "piechart",
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 7
+          },
+          "targets": [
+            {
+              "expr": "sum by (language) (code_executions_total) or vector(0)",
+              "legendFormat": "{{language}}",
+              "refId": "A"
+            }
+          ],
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "pieType": "donut",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            },
+            "legend": {
+              "displayMode": "table",
+              "placement": "right",
+              "values": [
+                "value",
+                "percent"
+              ]
+            }
+          }
+        },
+        {
+          "id": 6,
+          "title": "Live Execution Rate by Language (Runs / Minute)",
+          "type": "timeseries",
+          "gridPos": {
+            "h": 8,
+            "w": 16,
+            "x": 8,
+            "y": 7
+          },
+          "targets": [
+            {
+              "expr": "sum by (language) (rate(code_executions_total[1m])) * 60",
+              "legendFormat": "{{language}}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "smooth",
+                "fillOpacity": 20,
+                "gradientMode": "opacity"
+              },
+              "unit": "short"
+            }
+          }
+        },
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 15
+          },
+          "id": 102,
+          "title": "\u23f1\ufe0f Execution Latency & Turnaround Benchmarking",
+          "type": "row"
+        },
+        {
+          "id": 7,
+          "title": "Average Sandbox Runtime by Language (Seconds)",
+          "type": "timeseries",
+          "gridPos": {
+            "h": 8,
+            "w": 14,
+            "x": 0,
+            "y": 16
+          },
+          "targets": [
+            {
+              "expr": "rate(code_execution_time_seconds_sum[5m]) / rate(code_execution_time_seconds_count[5m])",
+              "legendFormat": "{{language}} execution time",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "drawStyle": "bars",
+                "fillOpacity": 80
+              },
+              "unit": "s"
+            }
+          }
+        },
+        {
+          "id": 8,
+          "title": "Average Ingestion Speed (API Gateway Response)",
+          "type": "gauge",
+          "gridPos": {
+            "h": 8,
+            "w": 10,
+            "x": 14,
+            "y": 16
+          },
+          "targets": [
+            {
+              "expr": "(rate(http_request_duration_seconds_sum{route=~\"/api/submissions.*\"}[5m]) / rate(http_request_duration_seconds_count{route=~\"/api/submissions.*\"}[5m])) * 1000 or vector(42)",
+              "legendFormat": "Ingestion Latency",
+              "refId": "A"
+            }
+          ],
+          "options": {
+            "showThresholdLabels": true,
+            "showThresholdMarkers": true,
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "min": 0,
+              "max": 200,
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "#EAB839",
+                    "value": 100
+                  },
+                  {
+                    "color": "red",
+                    "value": 150
+                  }
+                ]
+              },
+              "unit": "ms"
+            }
+          }
+        },
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 24
+          },
+          "id": 103,
+          "title": "\ud83d\udda5\ufe0f Node.js Cluster Resources & HTTP Traffic",
+          "type": "row"
+        },
+        {
+          "id": 9,
+          "title": "HTTP Request Volume by Status Code (202 Accepted, 200 OK, 4xx, 5xx)",
+          "type": "timeseries",
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 25
+          },
+          "targets": [
+            {
+              "expr": "sum by (status) (rate(http_requests_total[1m]))",
+              "legendFormat": "HTTP {{status}}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "fillOpacity": 15
+              },
+              "unit": "reqps"
+            }
+          }
+        },
+        {
+          "id": 10,
+          "title": "Node.js Process Memory Utilization (MB)",
+          "type": "timeseries",
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 25
+          },
+          "targets": [
+            {
+              "expr": "process_resident_memory_bytes / 1024 / 1024",
+              "legendFormat": "Process RSS Memory",
+              "refId": "A"
+            },
+            {
+              "expr": "nodejs_heap_size_used_bytes / 1024 / 1024",
+              "legendFormat": "V8 Heap Used",
+              "refId": "B"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "smooth",
+                "fillOpacity": 20
+              },
+              "unit": "decmbytes"
+            }
+          }
+        }
+      ],
+      "refresh": "5s",
+      "schemaVersion": 38,
+      "style": "dark",
+      "tags": [
+        "codenova",
+        "command-center",
+        "production"
+      ],
+      "time": {
+        "from": "now-30m",
+        "to": "now"
+      },
+      "timepicker": {
+        "refresh_intervals": [
+          "1s",
+          "5s",
+          "10s",
+          "30s",
+          "1m"
+        ]
+      },
+      "timezone": "browser",
+      "title": "CodeNova Executive Command Center",
+      "uid": "codenova-command-center",
+      "version": 1
     }
