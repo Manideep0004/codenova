@@ -21,13 +21,29 @@ spec:
           env:
             - name: GF_SECURITY_ADMIN_PASSWORD
               value: "Codenova@2025!"
+            - name: GF_SERVER_ROOT_URL
+              value: "%(protocol)s://%(domain)s/"
+            - name: GF_SERVER_SERVE_FROM_SUB_PATH
+              value: "false"
+            - name: GF_SECURITY_ALLOW_EMBEDDING
+              value: "true"
+            - name: GF_SECURITY_COOKIE_SECURE
+              value: "false"
+            - name: GF_ANALYTICS_REPORTING_ENABLED
+              value: "false"
+            - name: GF_ANALYTICS_CHECK_FOR_UPDATES
+              value: "false"
+            - name: GF_AUTH_ANONYMOUS_ENABLED
+              value: "true"
+            - name: GF_AUTH_ANONYMOUS_ORG_ROLE
+              value: "Admin"
           resources:
             requests:
               cpu: 100m
-              memory: 128Mi
+              memory: 256Mi
             limits:
               cpu: 500m
-              memory: 384Mi
+              memory: 768Mi
           volumeMounts:
             - name: datasources
               mountPath: /etc/grafana/provisioning/datasources
