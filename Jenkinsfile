@@ -6,11 +6,11 @@ pipeline {
     }
 
     environment {
-        AWS_REGION      = 'ap-south-1'
+        AWS_REGION      = 'ap-southeast-2'
         AWS_ACCOUNT_ID  = '427282815124'
         ECR_BACKEND     = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/codenova-backend"
         ECR_FRONTEND    = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/codenova-frontend"
-        DOMAIN          = "codenova.nip.io"
+        DOMAIN          = "a822db8a1f8a247149032b48d718a24e-810033143.ap-southeast-2.elb.amazonaws.com"
         EMAIL_TO        = "manideepgudiya2004@gmail.com"
     }
 
