@@ -88,7 +88,7 @@ async function runTest(base, token, name, languageId, code, stdin) {
 }
 
 async function main() {
-  const base = 'http://a48d1e02af93040df93d65bdcd9ddda6-1712028144.ap-southeast-2.elb.amazonaws.com:5000/api';
+  const base = 'http://a701503410acf4e78b3518dff74c4098-1396927807.ap-southeast-2.elb.amazonaws.com/api';
   console.log('Logging in as admin...');
   const loginRes = await post(base + '/auth/login', { email: 'admin@codenova.io', password: 'Admin@123' });
   const token = loginRes.data.token;
